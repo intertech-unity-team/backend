@@ -90,7 +90,7 @@ contract MyProject {
         selected_child.amount += msg.value;
     }
 
-    function child_Withdraws_Money(address payable address_child, uint256 amount, uint256 releaseTime) public payable {
+    function child_Withdraws_Money(address payable address_child, uint256 amount, uint256 releaseTime) external payable {
         Child storage selected_child = children[address_child];
         uint currentTime = block.timestamp;
         require(currentTime > releaseTime, "You are not 18 yet.");
@@ -99,7 +99,7 @@ contract MyProject {
         selected_child.childAddress.transfer(amount);
     }
 
-    function parent_Withdraws_Money(address payable address_child, uint256 amount) public payable {
+    function parent_Withdraws_Money(address payable address_child, uint256 amount) external payable {
         Parent storage selected_parent = parents[msg.sender];
         Child storage selected_child = children[address_child];
         require(selected_child.amount > amount, "You don't have enough money");
@@ -111,6 +111,23 @@ contract MyProject {
         return address(this).balance;
     }
 
+    enum Role {
+        Admin,
+        Parent,
+        Child,
+        Unregistered
+    }
+
+    function getRole(address wanted_address) public view returns(Role result) {
+        if(wanted_address == owner) {   
+            result = Role.Admin ;
+        } else if( children[wanted_address].childAddress != address(0) ){
+            result = Role.Child;
+        } else if( parents[wanted_address].parentAddress != address(0) ) {
+            result = Role.Parent;  
+        } else {
+            result= Role.Unregistered;
+        } 
+    }
 }
 
-// find role bu wallet address ne? hiç yok mu? return tip: parent,kid,admin,unregistered, enum
