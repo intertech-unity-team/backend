@@ -43,10 +43,10 @@ contract MyProject {
         parentaddresslist.push(parentAddress);
     }
 
-    /*function getParent() public view returns(Parent memory result) {
+    function getParent() public view returns(Parent memory result) {
         Parent storage Message_Sender_Parent = parents[msg.sender];
         result = Message_Sender_Parent;
-    }*/
+    }
     
 
     function addChild(string memory name, string memory surname, address payable childAddress, uint256 releaseTime ) public onlyParent{
@@ -65,7 +65,7 @@ contract MyProject {
         result = Message_Sender_Child;
     }
 
-    function deleteChildWithID(address myaddress) public onlyParent {
+    function delete_Child_With_ID(address myaddress) public onlyParent {
         Child storage selectedchild = children[myaddress];
         delete(selectedchild.name);
         delete(selectedchild.surname);
@@ -83,21 +83,21 @@ contract MyProject {
         _;
     }
     
-    function getAllParents() public view onlyOwner returns(Parent[] memory result) {
+    function get_All_Parents() public view onlyOwner returns(Parent[] memory result) {
         result = new Parent[](parentaddresslist.length);
         for (uint i = 0; i < parentaddresslist.length; i++) {
             result[i] = parents[parentaddresslist[i]];
         }      
     }
 
-    function getAllChildren() public view onlyOwner returns(Child[] memory result2) {
+    function get_All_Children() public view onlyOwner returns(Child[] memory result2) {
         result2 = new Child[](childaddresslist.length);
         for (uint j = 0; j < childaddresslist.length; j++) {
             result2[j] = children[childaddresslist[j]];
         }      
     }
 
-    function getChildrenOfParent(address parentAddress) external view returns(Child[] memory result3){
+    function get_Children_Of_Parent(address parentAddress) external view returns(Child[] memory result3){
         result3 = new Child[](parents[parentAddress].children.length);
         for (uint j = 0; j < parents[parentAddress].children.length; j++) {
             result3[j] = children[parents[parentAddress].children[j]];
