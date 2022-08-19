@@ -75,6 +75,11 @@ contract MyProject {
         require(msg.sender == owner, "Only owner can use this function");
         _;
     }
+
+    modifier onlyParent(){
+        require(parents[msg.sender].parentAddress != address(0), "Only parent can use this function" );
+        _;
+    }
      
     function getAllParents() public view onlyOwner returns(Parent[] memory result) {
         result = new Parent[](parentaddresslist.length);
