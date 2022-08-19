@@ -5,7 +5,6 @@ import { ethers } from "hardhat";
 
 describe("MyProject", function(){
   async function deploy() {
-    
     const [owner, otherAccount] = await ethers.getSigners();
     const MyProject = await ethers.getContractFactory("MyProject");
     const myproject = await MyProject.connect(owner).deploy();
