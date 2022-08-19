@@ -4,11 +4,12 @@ pragma solidity ^0.8.9;
 contract MyProject {
     address owner;
     
+
     constructor() {
         owner = msg.sender;
     }
 
-    function getOwner() public view returns(address){
+    function getOwner() public view returns(address){ 
         return owner;
     }
 
@@ -32,6 +33,7 @@ contract MyProject {
     mapping(address => Parent) private parents;
     mapping(address => Child) private children;
     address[] public parentaddresslist;
+    address[] public childaddresslist;
 
     function addParent(string memory name, string memory surname, address payable parentAddress) public {
         Parent storage added_parent = parents[parentAddress];
@@ -42,20 +44,21 @@ contract MyProject {
         parentaddresslist.push(parentAddress);
     }
 
-    function getParent() public view returns(Parent memory result) {
+    /*function getParent() public view returns(Parent memory result) {
         Parent storage Message_Sender_Parent = parents[msg.sender];
         result = Message_Sender_Parent;
-    }
+    }*/
     
-    // onlyparent yap
 
-    function addChild(string memory name, string memory surname, address payable childAddress, uint256 releaseTime ) public {
+    function addChild(string memory name, string memory surname, address payable childAddress, uint256 releaseTime ) public onlyParent{
+        parents[msg.sender].children.push(childAddress);
         Child storage added_child = children[childAddress];
         require( added_child.childAddress == address(0), "The child has already stored." );
         added_child.name = name;
         added_child.surname = surname;
         added_child.childAddress = childAddress;
         added_child.releaseTime = releaseTime;
+        childaddresslist.push(childAddress);
     }
 
     function getChild() public view returns(Child memory result) {
@@ -63,7 +66,7 @@ contract MyProject {
         result = Message_Sender_Child;
     }
 
-    function deleteChildWithID(address myaddress) public {
+    function deleteChildWithID(address myaddress) public onlyParent {
         Child storage selectedchild = children[myaddress];
         delete(selectedchild.name);
         delete(selectedchild.surname);
@@ -80,7 +83,7 @@ contract MyProject {
         require(parents[msg.sender].parentAddress != address(0), "Only parent can use this function" );
         _;
     }
-     
+    
     function getAllParents() public view onlyOwner returns(Parent[] memory result) {
         result = new Parent[](parentaddresslist.length);
         for (uint i = 0; i < parentaddresslist.length; i++) {
@@ -88,12 +91,26 @@ contract MyProject {
         }      
     }
 
-    //getallchildren func  ekle
+    function getAllChildren() public view onlyOwner returns(Child[] memory result2) {
+        result2 = new Child[](childaddresslist.length);
+        for (uint j = 0; j < childaddresslist.length; j++) {
+            result2[j] = children[childaddresslist[j]];
+        }      
+    }
 
-    function deposit_to_Child(address payable address_child) public payable {
+    function getChildrenOfParent(address parentAddress) external view returns(Child[] memory result3){
+        result3 = new Child[](parents[parentAddress].children.length);
+        for (uint j = 0; j < parents[parentAddress].children.length; j++) {
+            result3[j] = children[parents[parentAddress].children[j]];
+        }
+    }
+    
+    function deposit_to_Child(address payable address_child) external onlyParent payable {
+        require( children[address_child].childAddress != address(0), "The child isn't stored." );
         Child storage selected_child = children[address_child];
         selected_child.amount += msg.value;
     }
+
 
     function child_Withdraws_Money(address payable address_child, uint256 amount, uint256 releaseTime) external payable {
         Child storage selected_child = children[address_child];
@@ -104,7 +121,7 @@ contract MyProject {
         selected_child.childAddress.transfer(amount);
     }
 
-    function parent_Withdraws_Money(address payable address_child, uint256 amount) external payable {
+    function parent_Withdraws_Money(address payable address_child, uint256 amount) external onlyParent payable {
         Parent storage selected_parent = parents[msg.sender];
         Child storage selected_child = children[address_child];
         require(selected_child.amount > amount, "You don't have enough money");
@@ -112,7 +129,7 @@ contract MyProject {
         selected_parent.parentAddress.transfer(amount);
     }
 
-    function get_Balance_of_Contract() public view returns(uint256){
+    function get_Balance_of_Contract() public view onlyOwner returns(uint256){
         return address(this).balance;
     }
 
@@ -135,4 +152,3 @@ contract MyProject {
         } 
     }
 }
-
