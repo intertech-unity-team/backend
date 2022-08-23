@@ -123,11 +123,11 @@ describe("MyProject", function(){
     const withdraw = await myproject.connect(signers[1]).parent_Withdraws_Money("0x7843D7A9896384Fcb2dB110A5613Fa7245257d1D", 2);
     const allParents = await myproject.get_All_Parents();
     const firstParent = allParents[0];
-    const parentBalance = await myproject.provider.getBalance("0xF9ecDb67535d2c7e74521B63e9dCA085b71Fdccc");
+    //const parentBalance = await myproject.provider.getBalance("0xF9ecDb67535d2c7e74521B63e9dCA085b71Fdccc");
     const allChildren = await myproject.get_All_Children();
     const firstChild = allChildren[0];
     expect(firstChild.amount).to.be.equal(3);
-    //expect(parentBalance).to.be.equal(1e+22 - 2);
+    //expect(parentBalance).to.be.equal(1e+22 + 2);
   })
 
   it("Should check roles", async function() {
@@ -143,4 +143,12 @@ describe("MyProject", function(){
     expect(mychild).to.be.equal(2);
     expect(unregistered).to.be.equal(3);
   })
+
+  // it("Should get the balance of the contract", async function () {
+  //   const signers = await ethers.getSigners();
+  //   const contractBalance = await myproject.provider.getBalance("0x1c80881894B2d90e163d844b91f82322B628a8Db");
+  //   const myBalance = await myproject.get_Balance_of_Contract();
+  //   expect(contractBalance).to.be.equal(myBalance);
+  // })
+
 });
