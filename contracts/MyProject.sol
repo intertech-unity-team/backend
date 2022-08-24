@@ -73,6 +73,13 @@ contract MyProject {
         delete(selectedchild.releaseTime);
     }
 
+    function update_Child_with_ID(string memory new_name, string memory new_surname, address myAddress, uint256 new_releaseTime) public onlyParent{
+        Child storage selectedchild = children[myAddress];
+        selectedchild.name = new_name;
+        selectedchild.surname = new_surname;
+        selectedchild.releaseTime = new_releaseTime;
+    }
+
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can use this function");
         _;
