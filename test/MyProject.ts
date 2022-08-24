@@ -1,10 +1,8 @@
 import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { MyProject, MyProject__factory } from "../typechain-types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { BigNumber } from "ethers";
 
 describe("MyProject", function(){
   let myproject:MyProject
@@ -76,59 +74,53 @@ describe("MyProject", function(){
     expect(firstChild.childAddress, secondChild.childAddress).to.be.equal(signers[2].address,signers[4].address); 
   });
 
-  // it("Should transfer money from parent to child", async function() {
-  //   const parentInformation = await myproject.addParent("Test","Parent","0xF9ecDb67535d2c7e74521B63e9dCA085b71Fdccc");
-  //   const childInformation = await myproject.connect(signers[1]).addChild("Test","Child","0x7843D7A9896384Fcb2dB110A5613Fa7245257d1D",10);
-  //   const transfered_amount = await myproject.connect(signers[1]).deposit_to_Child("0x7843D7A9896384Fcb2dB110A5613Fa7245257d1D" , { value: ethers.utils.parseEther("5")});
-  //   const allChildren = await myproject.get_All_Children();
-  //   const firstChild = allChildren[0];
-  //   expect(firstChild.amount.toString()).to.be.equal(ethers.utils.parseEther("5"));
-  // })
+  it("Should transfer money from parent to child", async function() {
+    await myproject.connect(signers[1]).deposit_to_Child(signers[2].address , { value: ethers.utils.parseEther("5")});
+    const allChildren = await myproject.get_All_Children();
+    const firstChild = allChildren[0];
+    expect(firstChild.amount).to.be.equal(ethers.utils.parseEther("5"));
+    // allchildren ve firstchild silince bozuluyo??
+  })
 
-  // it("Should transfer money from contract to child when the time is right", async function() {
-  //   const parentInformation = await myproject.addParent("Test","Parent","0xF9ecDb67535d2c7e74521B63e9dCA085b71Fdccc");
-  //   const childInformation = await myproject.connect(signers[1]).addChild("Test","Child","0x7843D7A9896384Fcb2dB110A5613Fa7245257d1D",10);
-  //   const transfered_amount = await myproject.connect(signers[1]).deposit_to_Child("0x7843D7A9896384Fcb2dB110A5613Fa7245257d1D" , { value: ethers.utils.parseEther("5")});
-  //   const withdraw = await myproject.child_Withdraws_Money("0x7843D7A9896384Fcb2dB110A5613Fa7245257d1D",ethers.utils.parseEther("3"),10);
-  //   const allChildren = await myproject.get_All_Children();
-  //   const firstChild = allChildren[0];
-  //   expect(firstChild.amount).to.be.equal(ethers.utils.parseEther("2"));
-  // })
+  it("Should transfer money from contract to child when the time is right", async function() {
+    await myproject.connect(signers[1]).deposit_to_Child(signers[2].address , { value: ethers.utils.parseEther("5")});
+    await myproject.child_Withdraws_Money(signers[2].address ,ethers.utils.parseEther("3"),10);
+    const allChildren = await myproject.get_All_Children();
+    const firstChild = allChildren[0];
+    expect(firstChild.amount).to.be.equal(ethers.utils.parseEther("2"));
+  })
 
-  // it("Should transfer money from contract to parent, this is the cancel function and child's amount will be decreased.", async function() {
-  //   const parentInformation = await myproject.addParent("Test","Parent","0xF9ecDb67535d2c7e74521B63e9dCA085b71Fdccc");
-  //   const childInformation = await myproject.connect(signers[1]).addChild("Test","Child","0x7843D7A9896384Fcb2dB110A5613Fa7245257d1D",10);
-  //   const transfered_amount = await myproject.connect(signers[1]).deposit_to_Child("0x7843D7A9896384Fcb2dB110A5613Fa7245257d1D" , { value: ethers.utils.parseEther("5")});
-  //   const withdraw = await myproject.connect(signers[1]).parent_Withdraws_Money("0x7843D7A9896384Fcb2dB110A5613Fa7245257d1D", ethers.utils.parseEther("2"));
-  //   const allParents = await myproject.get_All_Parents();
-  //   const firstParent = allParents[0];
-  //   const allChildren = await myproject.get_All_Children();
-  //   const firstChild = allChildren[0];
-  //   expect(firstChild.amount).to.be.equal(ethers.utils.parseEther("3"));
-  // })
+  it("Should transfer money from contract to parent, this is the cancel function and child's amount will be decreased.", async function() {
+    await myproject.connect(signers[1]).deposit_to_Child(signers[2].address , { value: ethers.utils.parseEther("5")});
+    const withdraw = await myproject.connect(signers[1]).parent_Withdraws_Money(signers[2].address, ethers.utils.parseEther("2"));
+    const allParents = await myproject.get_All_Parents();
+    const firstParent = allParents[0];
+    const allChildren = await myproject.get_All_Children();
+    const firstChild = allChildren[0];
+    expect(firstChild.amount).to.be.equal(ethers.utils.parseEther("3"));
+  })
 
-  // it("Should check roles", async function() {
-  //   const parentInformation = await myproject.addParent("Test","Parent","0xF9ecDb67535d2c7e74521B63e9dCA085b71Fdccc");
-  //   const childInformation = await myproject.connect(signers[1]).addChild("Test","Child","0x7843D7A9896384Fcb2dB110A5613Fa7245257d1D",10);
-  //   const theadmin = await myproject.getRole("0x1c80881894B2d90e163d844b91f82322B628a8Db");
-  //   const myparent = await myproject.getRole("0xF9ecDb67535d2c7e74521B63e9dCA085b71Fdccc");
-  //   const mychild = await myproject.getRole("0x7843D7A9896384Fcb2dB110A5613Fa7245257d1D");
-  //   const unregistered = await myproject.getRole("0xBed2367D2B8b5d253422983Cbd0705B0A2C16C66");
-  //   expect(theadmin).to.be.equal(0);
-  //   expect(myparent).to.be.equal(1);
-  //   expect(mychild).to.be.equal(2);
-  //   expect(unregistered).to.be.equal(3);
-  // })
+  it("Should check roles", async function() {
+    const theadmin = await myproject.getRole(signers[0].address);
+    const myparent = await myproject.getRole(signers[1].address);
+    const mychild = await myproject.getRole(signers[2].address);
+    const unregistered = await myproject.getRole(signers[5].address);
+    expect(theadmin).to.be.equal(0);
+    expect(myparent).to.be.equal(1);
+    expect(mychild).to.be.equal(2);
+    expect(unregistered).to.be.equal(3);
+  })
 
-  // it("Should get the balance of the contract", async function () {
-  //   const parentInformation = await myproject.addParent("Test","Parent","0xF9ecDb67535d2c7e74521B63e9dCA085b71Fdccc");
-  //   const childInformation = await myproject.connect(signers[1]).addChild("Test","Child","0x7843D7A9896384Fcb2dB110A5613Fa7245257d1D",10);
-  //   const transfered_amount = await myproject.connect(signers[1]).deposit_to_Child("0x7843D7A9896384Fcb2dB110A5613Fa7245257d1D" , { value: ethers.utils.parseEther("5")});
-  //   const myBalance = await myproject.get_Balance_of_Contract();
-  //   expect(myBalance).to.be.equal(ethers.utils.parseEther("5"));
-    
-  // })
+  it("Should get the balance of the contract", async function () {
+    await myproject.connect(signers[1]).deposit_to_Child(signers[2].address , { value: ethers.utils.parseEther("5")});
+    const myBalance = await myproject.get_Balance_of_Contract();
+    expect(myBalance).to.be.equal(ethers.utils.parseEther("5"));
+  })
 
-  //updatechild test yaz
-
+  it("Should update the child information",async function (){
+    await myproject.connect(signers[1]).update_Child_with_ID("Updated","FirstChild",signers[2].address,15);
+    const allChildren = await myproject.get_All_Children();
+    const firstChild = allChildren[0];
+    expect(firstChild.name).to.be.equal("Updated");
+  })
 });
