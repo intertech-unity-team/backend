@@ -16,6 +16,8 @@ contract MyProject {
         string name;
         string surname;
         address payable parentAddress;
+        string email;
+        uint256 phoneNumber;
         address[] children;
         
     }
@@ -26,6 +28,8 @@ contract MyProject {
         address payable childAddress;
         uint256 releaseTime;
         uint256 amount;
+        string email;
+        uint256 phoneNumber;
 
     }
 
@@ -34,12 +38,14 @@ contract MyProject {
     address[] public parentaddresslist;
     address[] public childaddresslist;
 
-    function addParent(string memory name, string memory surname, address payable parentAddress) public {
+    function addParent(string memory name, string memory surname, address payable parentAddress, string memory email, uint256 phoneNumber) public {
         Parent storage added_parent = parents[parentAddress];
         require( added_parent.parentAddress == address(0), "The parent has already stored." );
         added_parent.name = name;
         added_parent.surname = surname;
         added_parent.parentAddress = parentAddress;
+        added_parent.email = email;
+        added_parent.phoneNumber = phoneNumber;
         parentaddresslist.push(parentAddress);
     }
 
@@ -49,7 +55,7 @@ contract MyProject {
     }
     
 
-    function addChild(string memory name, string memory surname, address payable childAddress, uint256 releaseTime ) public onlyParent{
+    function addChild(string memory name, string memory surname, address payable childAddress, uint256 releaseTime, string memory email, uint256 phoneNumber ) public onlyParent{
         parents[msg.sender].children.push(childAddress);
         Child storage added_child = children[childAddress];
         require( added_child.childAddress == address(0), "The child has already stored." );
@@ -57,6 +63,8 @@ contract MyProject {
         added_child.surname = surname;
         added_child.childAddress = childAddress;
         added_child.releaseTime = releaseTime;
+        added_child.email = email;
+        added_child.phoneNumber = phoneNumber;
         childaddresslist.push(childAddress);
     }
 
@@ -71,13 +79,17 @@ contract MyProject {
         delete(selectedchild.surname);
         delete(selectedchild.childAddress);
         delete(selectedchild.releaseTime);
+        delete(selectedchild.email);
+        delete(selectedchild.phoneNumber);
     }
 
-    function update_Child_with_ID(string memory new_name, string memory new_surname, address myAddress, uint256 new_releaseTime) public onlyParent{
+    function update_Child_with_ID(string memory new_name, string memory new_surname, address myAddress, uint256 new_releaseTime, string memory new_email, uint256 new_phoneNumber) public onlyParent{
         Child storage selectedchild = children[myAddress];
         selectedchild.name = new_name;
         selectedchild.surname = new_surname;
         selectedchild.releaseTime = new_releaseTime;
+        selectedchild.email = new_email;
+        selectedchild.phoneNumber = new_phoneNumber;
     }
 
     modifier onlyOwner() {
