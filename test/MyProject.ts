@@ -32,9 +32,9 @@ describe("MyProject", function(){
     unregSigner = signers[5];
 
     await myproject.deployed();
-    await myproject.addParent("Test","Parent",parentSigner.address);
-    await myproject.connect(signers[1]).addChild("Test","Child",childSigner1.address,10);
-    await myproject.connect(signers[1]).addChild("Test2","Child2",childSigner2.address,10);
+    await myproject.addParent("Test","Parent",parentSigner.address,"emailparent",532);
+    await myproject.connect(signers[1]).addChild("Test","Child",childSigner1.address,10,"emailchild1",534);
+    await myproject.connect(signers[1]).addChild("Test2","Child2",childSigner2.address,10,"emailchild2",535);
 
     allParents = await myproject.get_All_Parents();
     theParent = await myproject.connect(parentSigner).getParent();
@@ -119,7 +119,7 @@ describe("MyProject", function(){
   })
 
   it("Should update the child information",async function (){
-    await myproject.connect(signers[1]).update_Child_with_ID("Updated","FirstChild",signers[2].address,15);
+    await myproject.connect(signers[1]).update_Child_with_ID("Updated","FirstChild",signers[2].address,15,"updatedmail",540);
     const myChild = await myproject.connect(childSigner1).getChild();
     expect(myChild.name).to.be.equal("Updated");
   })
